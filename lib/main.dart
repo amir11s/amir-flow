@@ -7,7 +7,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
-// -------------------- ابزار ----------------
 String fa(String s) {
   const en = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
   const pe = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
@@ -24,13 +23,12 @@ const monthNames = [
 ];
 const weekDays = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
 
-// -------------------- مدل ----------------
 class Task {
   final String id;
-  final String dayKey; // "1403/5/12"
+  final String dayKey;
   final String title;
-  final int startMinutes; // دقیقه از نیمه‌شب
-  final int duration; // 30 / 60 / 120
+  final int startMinutes;
+  final int duration;
 
   Task({
     required this.id,
@@ -70,7 +68,6 @@ class Task {
   int get notifyBase => id.hashCode.abs() % 500000;
 }
 
-// -------------------- ذخیره‌سازی ----------------
 class Store {
   static final List<Task> tasks = [];
   static const _key = 'amir_flow_tasks_v1';
@@ -95,7 +92,6 @@ class Store {
       tasks.where((t) => t.dayKey == dayKey).length;
 }
 
-// -------------------- نوتیفیکیشن ----------------
 class Notify {
   static final _plugin = FlutterLocalNotificationsPlugin();
   static const _channelId = 'amir_flow_channel';
@@ -154,7 +150,6 @@ class Notify {
   static Future<void> cancel(int id) => _plugin.cancel(id);
 }
 
-// -------------------- برنامه‌ریزی یک تسک ----------------
 Future<void> scheduleTask(Task t) async {
   final p = t.dayKey.split('/').map(int.parse).toList();
   final g = Jalali(p[0], p[1], p[2]).toGregorian();
@@ -181,7 +176,6 @@ Future<void> cancelTask(Task t) async {
   await Notify.cancel(t.notifyBase * 2 + 1);
 }
 
-// -------------------- main ----------------
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Notify.init();
@@ -204,7 +198,6 @@ class AmirFlowApp extends StatelessWidget {
           brightness: Brightness.dark,
         ),
         scaffoldBackgroundColor: const Color(0xFF12121A),
-        fontFamily: 'Vazirmatn',
       ),
       builder: (context, child) =>
           Directionality(textDirection: TextDirection.rtl, child: child!),
@@ -213,7 +206,6 @@ class AmirFlowApp extends StatelessWidget {
   }
 }
 
-// -------------------- صفحه تقویم ----------------
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
   @override
@@ -268,7 +260,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.2,
-                    color: Colors.white.withValues(alpha: 0.95))),
+                    color: Colors.white.withOpacity(0.95))),
           ],
         ),
       ),
@@ -307,7 +299,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               Text(fa(Jalali.now().formatFullDate().split(' ').first),
                   style: TextStyle(
                       fontSize: 11,
-                      color: Colors.white.withValues(alpha: 0.5))),
+                      color: Colors.white.withOpacity(0.5))),
             ],
           ),
           IconButton(
@@ -331,7 +323,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white.withValues(alpha: 0.45))),
+                            color: Colors.white.withOpacity(0.45))),
                   ),
                 ))
             .toList(),
@@ -341,7 +333,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   Widget _buildGrid() {
     final first = Jalali(_year, _month, 1);
-    final offset = first.weekDay - 1; // شنبه = 0
+    final offset = first.weekDay - 1;
     final len = first.monthLength;
     final cells = ((offset + len) / 7).ceil() * 7;
     final today = Jalali.now();
@@ -383,7 +375,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               border: Border.all(
                 color: isToday
                     ? const Color(0xFF9C8CFF)
-                    : Colors.white.withValues(alpha: 0.05),
+                    : Colors.white.withOpacity(0.05),
               ),
             ),
             child: Column(
@@ -396,7 +388,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             isToday ? FontWeight.bold : FontWeight.normal,
                         color: isToday
                             ? Colors.white
-                            : Colors.white.withValues(alpha: 0.85))),
+                            : Colors.white.withOpacity(0.85))),
                 const SizedBox(height: 3),
                 if (count > 0)
                   Container(
@@ -404,8 +396,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                     decoration: BoxDecoration(
                       color: isToday
-                          ? Colors.white.withValues(alpha: 0.28)
-                          : const Color(0xFF6C5CE7).withValues(alpha: 0.35),
+                          ? Colors.white.withOpacity(0.28)
+                          : const Color(0xFF6C5CE7).withOpacity(0.35),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(fa(count.toString()),
@@ -420,7 +412,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 }
 
-// -------------------- صفحه روز ----------------
 class DayScreen extends StatefulWidget {
   final int jy, jm, jd;
   const DayScreen(
@@ -569,7 +560,7 @@ class _DayScreenState extends State<DayScreen> {
             Text(fa('${widget.jy}  |  ${g.year}-${g.month}-${g.day}'),
                 style: TextStyle(
                     fontSize: 11,
-                    color: Colors.white.withValues(alpha: 0.5))),
+                    color: Colors.white.withOpacity(0.5))),
           ],
         ),
       ),
@@ -586,11 +577,11 @@ class _DayScreenState extends State<DayScreen> {
                 children: [
                   Icon(Icons.event_note,
                       size: 64,
-                      color: Colors.white.withValues(alpha: 0.15)),
+                      color: Colors.white.withOpacity(0.15)),
                   const SizedBox(height: 12),
                   Text('برای این روز برنامه‌ای نداری',
                       style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.5))),
+                          color: Colors.white.withOpacity(0.5))),
                 ],
               ),
             )
@@ -605,7 +596,7 @@ class _DayScreenState extends State<DayScreen> {
                   background: Container(
                     margin: const EdgeInsets.only(bottom: 10),
                     decoration: BoxDecoration(
-                      color: Colors.redAccent.withValues(alpha: 0.7),
+                      color: Colors.redAccent.withOpacity(0.7),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     alignment: Alignment.centerLeft,
@@ -625,7 +616,7 @@ class _DayScreenState extends State<DayScreen> {
                       color: const Color(0xFF1C1C26),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.05)),
+                          color: Colors.white.withOpacity(0.05)),
                     ),
                     child: Row(
                       children: [
@@ -652,7 +643,7 @@ class _DayScreenState extends State<DayScreen> {
                                 style: TextStyle(
                                     fontSize: 12,
                                     color:
-                                        Colors.white.withValues(alpha: 0.5)),
+                                        Colors.white.withOpacity(0.5)),
                               ),
                             ],
                           ),
@@ -661,7 +652,7 @@ class _DayScreenState extends State<DayScreen> {
                           icon: Icon(Icons.notifications_active,
                               size: 20,
                               color: const Color(0xFF9C8CFF)
-                                  .withValues(alpha: 0.9)),
+                                  .withOpacity(0.9)),
                           tooltip: 'یادآوری مجدد',
                           onPressed: () async {
                             await scheduleTask(t);
