@@ -25,19 +25,38 @@ jobs:
 
       - name: Create Standard Flutter Project and Overwrite
         run: |
-          # 1. ساخت پروژه استاندارد
           flutter create temp_project
-          
-          # 2. کپی کردن فایل‌های ما
           cp lib/main.dart temp_project/lib/main.dart
           cp pubspec.yaml temp_project/pubspec.yaml
-          
-          # 3. رفتن به پوشه پروژه
           cd temp_project
           
-          # 4. ارتقای نسخه Kotlin به صورت خودکار و استاندارد
-          # این دستور از ابزار Gradle استفاده می‌کنه تا فایل رو بدون خرابی آپدیت کنه
-          flutter build apk --release --no-tree-shake-icons
+          # جایگزینی کامل فایل settings.gradle با نسخه درست (بدون دستکاری متنی)
+          cat > android/settings.gradle << 'EOF'
+          pluginManagement {
+              def flutterSdkPath = {
+                  def properties = new Properties()
+                  file("local.properties").withInputStream { properties.load(it) }
+                  def flutterSdkPath = properties.getProperty("flutter.sdk")
+                  assert flutterSdkPath != null, "flutter.sdk not set in local.properties"
+                  return flutterSdkPath
+              }()
+              includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+          plugins {
+              id "dev.flutter.flutter-plugin-loader" version "1.0.0"
+              id "com.android.application" version "8.1.0" apply false
+              id "org.jetbrains.kotlin.android" version "1.9.22" apply false
+          }
+          include ":app"
+          EOF
+          
+          flutter pub get
+          flutter build apk --release
           
       - name: Upload APK
         uses: actions/upload-artifact@v4
