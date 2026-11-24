@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
@@ -98,12 +97,7 @@ class Notify {
 
   static Future<void> init() async {
     tzdata.initializeTimeZones();
-    try {
-      final name = await FlutterTimezone.getLocalTimezone();
-      tz.setLocalLocation(tz.getLocation(name));
-    } catch (_) {
-      tz.setLocalLocation(tz.getLocation('Asia/Tehran'));
-    }
+    tz.setLocalLocation(tz.getLocation('Asia/Tehran'));
 
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
     await _plugin.initialize(const InitializationSettings(android: android));
@@ -144,6 +138,7 @@ class Notify {
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime, // این خط اضافه شد
     );
   }
 
@@ -296,7 +291,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 2),
-              Text(fa(Jalali.now().formatFullDate().split(' ').first),
+              Text('تقویم شمسی',
                   style: TextStyle(
                       fontSize: 11,
                       color: Colors.white.withOpacity(0.5))),
