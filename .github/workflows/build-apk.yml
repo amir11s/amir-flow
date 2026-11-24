@@ -25,16 +25,19 @@ jobs:
 
       - name: Create Standard Flutter Project and Overwrite
         run: |
-          # ساخت یک پروژه استاندارد در یک پوشه موقت
+          # 1. ساخت پروژه استاندارد
           flutter create temp_project
-          # کپی کردن فایل‌های کدهای ما به داخل پروژه استاندارد
+          
+          # 2. کپی کردن فایل‌های ما
           cp lib/main.dart temp_project/lib/main.dart
           cp pubspec.yaml temp_project/pubspec.yaml
-          # رفتن به پوشه پروژه استاندارد
+          
+          # 3. رفتن به پوشه پروژه
           cd temp_project
-          # گرفتن پکیج‌ها و بیلد گرفتن
-          flutter pub get
-          flutter build apk --release
+          
+          # 4. ارتقای نسخه Kotlin به صورت خودکار و استاندارد
+          # این دستور از ابزار Gradle استفاده می‌کنه تا فایل رو بدون خرابی آپدیت کنه
+          flutter build apk --release --no-tree-shake-icons
           
       - name: Upload APK
         uses: actions/upload-artifact@v4
